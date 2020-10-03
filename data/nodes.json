@@ -1,0 +1,35 @@
+{
+  "mainnet": {
+    "tor": [
+      "zdhkwneu7lfaum2p.onion:18099",
+      "fdlnlt5mr5o7lmhg.onion:18081",
+      "xmkwypann4ly64gh.onion:18081",
+      "xmrtolujkxnlinre.onion:18081",
+      "xmrag4hf5xlabmob.onion:18081"
+    ],
+    "clearnet": [
+      "run.your.own.node.xmr.pm:18089",
+      "super.fast.node.xmr.pm:18089",
+      "192.110.160.146:18089",
+      "uwillrunanodesoon.moneroworld.com:18089",
+      "192.110.160.146:18089",
+      "nodes.hashvault.pro:18081",
+      "node.supportxmr.com:18081",
+      "node.imonero.org:18081",
+      "xmr-node-eu.cakewallet.com:18081",
+      "xmr-node-usa-east.cakewallet.com:18081",
+      "node.bohemianpool.com:18081",
+      "node.xmr.pt:18081",
+      "node.xmr.ru:18081",
+      "node.xmrtbackb.one:18081",
+      "node.viaxmr.com:18081"
+    ]
+  },
+  "stagenet": {
+    "tor": [],
+    "clearnet": [
+      "run.your.own.node.xmr.pm:38089",
+      "super.fast.node.xmr.pm:38089"
+    ]
+  }
+}

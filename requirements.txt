@@ -1,0 +1,7 @@
+quart
+aioredis
+aiohttp
+quart_session
+beautifulsoup4
+aiohttp_socks
+python-dateutil

@@ -1,0 +1,4 @@
+.idea
+*.pyc
+data/fiatdb
+settings.py
