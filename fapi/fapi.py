@@ -270,7 +270,7 @@ class FeatherApi:
             blob = [{
                 'title': z['data']['title'],
                 'author': z['data']['author'],
-                'url': "https://old.reddit.com/" + z['data']['permalink'],
+                'url': "https://old.reddit.com" + z['data']['permalink'],
                 'comments': z['data']['num_comments']
             } for z in blob['data']['children']]
 
