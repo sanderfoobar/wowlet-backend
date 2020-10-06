@@ -26,10 +26,8 @@
       "node.imonero.org:18081",
       "xmr-node-eu.cakewallet.com:18081",
       "xmr-node-usa-east.cakewallet.com:18081",
-      "node.bohemianpool.com:18081",
       "node.xmr.pt:18081",
-      "node.xmr.ru:18081",
-      "node.xmrtbackb.one:18081"
+      "node.xmr.ru:18081"
     ]
   },
   "stagenet": {
