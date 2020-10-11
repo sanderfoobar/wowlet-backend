@@ -17,7 +17,6 @@
     "clearnet": [
       "eu-west.node.xmr.pm:18089",
       "eu-west-2.node.xmr.pm:18089",
-      "usa-west.node.xmr.pm:18081",
       "usa-east-va.node.xmr.pm:18089",
       "canada.node.xmr.pm:18089",
       "singapore.node.xmr.pm:18089",
@@ -28,7 +27,8 @@
       "xmr-node-eu.cakewallet.com:18081",
       "xmr-node-usa-east.cakewallet.com:18081",
       "node.xmr.pt:18081",
-      "node.xmr.ru:18081"
+      "node.xmr.ru:18081",
+      "xmr-peer-070.cypherpunklabs.com:18081"
     ]
   },
   "stagenet": {
