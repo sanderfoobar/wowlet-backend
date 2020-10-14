@@ -12,6 +12,8 @@ from datetime import datetime
 
 import aiohttp
 
+import settings
+
 
 class BlockHeight:
     @staticmethod
@@ -161,3 +163,65 @@ class TxFiatDb:
             self.data[_date.year][_date.month][_date.day] = v
 
         self.write()
+
+
+class XmrRig:
+    @staticmethod
+    async def releases():
+        from fapi.factory import app, cache
+        from fapi.fapi import FeatherApi
+
+        blob = await FeatherApi.redis_get("xmrig_releases")
+        if blob and app.config["DEBUG"]:
+            return blob
+
+        try:
+            result = await httpget(settings.urls["xmrig"])
+            if not isinstance(result, list):
+                raise Exception("JSON response was not a list")
+            if len(result) <= 1:
+                raise Exception("JSON response list was 1 or less")
+            result = result[0]
+            await cache.set("xmrig_releases", json.dumps(result))
+            blob = result
+        except Exception as ex:
+            app.logger.error(f"error parsing xmrig blob: {ex}")
+            if blob:
+                app.logger.warning(f"passing xmrig output from cache")
+                return blob
+
+        return blob
+
+    @staticmethod
+    async def after_releases(data):
+        from fapi.factory import api_data
+        from dateutil.parser import parse
+        _data = []
+        for asset in data['assets']:
+            for expected in ["tar.gz", ".zip"]:
+                if asset["state"] != "uploaded":
+                    continue
+                if asset["name"].endswith(expected):
+                    _data.append(asset)
+        version = data['tag_name']
+        assets = {}
+
+        for asset in _data:
+            operating_system = "linux"
+            if "msvc" in asset['name'] or "win64" in asset['name']:
+                operating_system = "windows"
+            elif "macos" in asset["name"]:
+                operating_system = "macos"
+
+            assets.setdefault(operating_system, [])
+            assets[operating_system].append({
+                "name": asset["name"],
+                "created_at": parse(asset["created_at"]).strftime("%Y-%m-%d"),
+                "url": f"https://github.com/xmrig/xmrig/releases/download/{version}/{asset['name']}",
+                "download_count": int(asset["download_count"])
+            })
+
+        api_data["xmrig"] = {
+            "version": version,
+            "assets": assets
+        }
