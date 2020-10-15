@@ -66,7 +66,7 @@ def create_app():
         f.close()
 
         from fapi.fapi import FeatherApi
-        from fapi.utils import loopyloop, TxFiatDb
+        from fapi.utils import loopyloop, TxFiatDb, XmrRig
         txfiatdb = TxFiatDb(settings.crypto_name, settings.crypto_block_date_start)
         loop.create_task(loopyloop(20, FeatherApi.xmrto_rates, FeatherApi.after_xmrto))
         loop.create_task(loopyloop(120, FeatherApi.crypto_rates, FeatherApi.after_crypto))
@@ -76,6 +76,7 @@ def create_app():
         loop.create_task(loopyloop(60, FeatherApi.blockheight, FeatherApi.after_blockheight))
         loop.create_task(loopyloop(60, FeatherApi.check_nodes, FeatherApi.after_check_nodes))
         loop.create_task(loopyloop(43200, txfiatdb.update))
+        loop.create_task(loopyloop(43200, XmrRig.releases, XmrRig.after_releases))
         import fapi.routes
 
     return app

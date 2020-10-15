@@ -14,6 +14,7 @@ crypto_symbol = "xmr"
 crypto_block_date_start = "20140418"
 
 urls = {
+    "xmrig": "https://api.github.com/repos/xmrig/xmrig/releases",
     "reddit": "https://www.reddit.com/r/monero/top.json?limit=100",
     "ccs": "https://ccs.getmonero.org",
     "fiat_rates": "https://api.exchangeratesapi.io/latest?base=USD",
