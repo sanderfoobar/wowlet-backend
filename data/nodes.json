@@ -28,7 +28,8 @@
       "xmr-node-usa-east.cakewallet.com:18081",
       "node.xmr.pt:18081",
       "node.xmr.ru:18081",
-      "xmr-peer-070.cypherpunklabs.com:18081"
+      "xmr-peer-070.cypherpunklabs.com:18081",
+      "xmr.fail:18081"
     ]
   },
   "stagenet": {
