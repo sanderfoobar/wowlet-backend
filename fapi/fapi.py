@@ -352,11 +352,12 @@ class FeatherApi:
                         async with aiohttp.ClientSession(**d) as session:
                             async with session.get(f"http://{node}/get_info") as response:
                                 blob = await response.json()
-                                for expect in ["nettype", "height"]:
+                                for expect in ["nettype", "height", "target_height"]:
                                     assert expect in blob
                                 _node = {
                                     "address": node,
                                     "height": int(blob["height"]),
+                                    "target_height": int(blob["target_height"]),
                                     "online": True,
                                     "nettype": blob["nettype"],
                                     "type": k
@@ -366,6 +367,7 @@ class FeatherApi:
                         _node = {
                             "address": node,
                             "height": 0,
+                            "target_height": 0,
                             "online": False,
                             "nettype": network_type,
                             "type": k
