@@ -6,6 +6,8 @@ debug = False
 host = "127.0.0.1"
 port = 1337
 redis_password = None
+redis_address = "redis://localhost"
+tor_socks = "socks5://127.0.0.1:9050"
 rpc_url = "http://127.0.0.1:18089"
 xmrchain = "https://stagenet.xmrchain.net"
 

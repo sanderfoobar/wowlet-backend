@@ -346,7 +346,7 @@ class FeatherApi:
                     timeout = aiohttp.ClientTimeout(total=5)
                     d = {'timeout': timeout}
                     if ".onion" in node:
-                        d['connector'] = ProxyConnector.from_url('socks5://127.0.0.1:9050')
+                        d['connector'] = ProxyConnector.from_url(settings.tor_socks)
                         d['timeout'] = aiohttp.ClientTimeout(total=12)
                     try:
                         async with aiohttp.ClientSession(**d) as session:

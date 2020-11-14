@@ -35,7 +35,7 @@ print("""\033[91m
 async def _setup_cache(app: Quart):
     global cache
     data = {
-        "address": "redis://localhost"
+        "address": settings.redis_address
     }
 
     if settings.redis_password:
