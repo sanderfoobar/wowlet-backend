@@ -24,6 +24,16 @@ class FeatherApi:
             app.logger.error(f"Redis error: {ex}")
 
     @staticmethod
+    async def redis_json_get(key, path="."):
+        from fapi.factory import app, cache
+        try:
+            data = await cache.execute('JSON.GET', key, path)
+            if data:
+                return json.loads(data)
+        except Exception as ex:
+            app.logger.error(f"Redis error: {ex}")
+
+    @staticmethod
     async def xmrto_rates():
         from fapi.factory import app, cache
         xmrto_rates = await FeatherApi.redis_get("xmrto_rates")
@@ -338,7 +348,10 @@ class FeatherApi:
 
     @staticmethod
     async def check_nodes():
-        from fapi.factory import nodes, app
+        from fapi.factory import app
+
+        nodes = await FeatherApi.redis_json_get("nodes")
+
         data = []
         for network_type, network_name in nodes.items():
             for k, _nodes in nodes[network_type].items():
@@ -362,6 +375,11 @@ class FeatherApi:
                                     "nettype": blob["nettype"],
                                     "type": k
                                 }
+
+                                # Filter out nodes affected by < v0.17.1.3 sybil attack
+                                if _node['target_height'] > _node["height"]:
+                                    continue
+
                     except Exception as ex:
                         app.logger.warning(f"node {node} not reachable")
                         _node = {

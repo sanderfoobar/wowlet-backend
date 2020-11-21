@@ -15,7 +15,6 @@ app = None
 cache = None
 connected_websockets = set()
 api_data = {}
-nodes = {}
 user_agents = None
 txfiatdb = None
 
@@ -53,17 +52,16 @@ def create_app():
 
     @app.before_serving
     async def startup():
-        global nodes, txfiatdb, user_agents
+        global txfiatdb, user_agents
         await _setup_cache(app)
         loop = asyncio.get_event_loop()
 
-        f = open("data/nodes.json", "r")
-        nodes = json.loads(f.read())
-        f.close()
+        with open('data/nodes.json', 'r') as f:
+            nodes = json.loads(f.read())
+            cache.execute('JSON.SET', 'nodes', '.', json.dumps(nodes))
 
-        f = open("data/user_agents.txt", "r")
-        user_agents = [l.strip() for l in f.readlines() if l.strip()]
-        f.close()
+        with open('data/user_agents.txt', 'r') as f:
+            user_agents = [l.strip() for l in f.readlines() if l.strip()]
 
         from fapi.fapi import FeatherApi
         from fapi.utils import loopyloop, TxFiatDb, XmrRig
