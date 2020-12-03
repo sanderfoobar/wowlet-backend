@@ -87,7 +87,7 @@ async def broadcast_nodes():
 
 
 async def httpget(url: str, json=True):
-    timeout = aiohttp.ClientTimeout(total=4)
+    timeout = aiohttp.ClientTimeout(total=30)
     headers = {"User-Agent": random_agent()}
     async with aiohttp.ClientSession(timeout=timeout) as session:
         async with session.get(url, headers=headers) as response:

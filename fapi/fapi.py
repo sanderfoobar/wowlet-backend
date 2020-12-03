@@ -178,72 +178,16 @@ class FeatherApi:
 
     @staticmethod
     async def ccs():
-        # CCS JSON api is broken ;x https://hackerone.com/reports/934231
         from fapi.factory import app, cache
         ccs = await FeatherApi.redis_get("ccs")
         if ccs and app.config["DEBUG"]:
             return ccs
 
-        try:
-            content = await httpget(f"{settings.urls['ccs']}/funding-required/", json=False)
-        except Exception as ex:
-            app.logger.error(f"error fetching ccs HTML: {ex}")
-            return ccs
+        content = await httpget(f"https://ccs.getmonero.org/index.php/projects", json=True)
 
-        try:
-            soup = BeautifulSoup(content, "html.parser")
-        except Exception as ex:
-            app.logger.error(f"error parsing ccs HTML page: {ex}")
-            return ccs
-
-        data = []
-        for x in soup.findAll("a", {"class": "ffs-idea"}):
-            try:
-                item = {
-                    "state": "FUNDING-REQUIRED",
-                    "author": x.find("p", {"class": "author-list"}).text,
-                    "date": x.find("p", {"class": "date-list"}).text,
-                    "title": x.find("h3").text,
-                    "raised_amount": float(x.find("span", {"class": "progress-number-funded"}).text),
-                    "target_amount": float(x.find("span", {"class": "progress-number-goal"}).text),
-                    "contributors": 0,
-                    "url": f"https://ccs.getmonero.org{x.attrs['href']}"
-                }
-                item["percentage_funded"] = item["raised_amount"] * (100 / item["target_amount"])
-                if item["percentage_funded"] >= 100:
-                    item["percentage_funded"] = 100.0
-                try:
-                    item["contributors"] = int(x.find("p", {"class": "contributor"}).text.split(" ")[0])
-                except:
-                    pass
-
-                href = x.attrs['href']
-
-                try:
-                    content = await httpget(f"{settings.urls['ccs']}{href}", json=False)
-                    try:
-                        soup2 = BeautifulSoup(content, "html.parser")
-                    except Exception as ex:
-                        app.logger.error(f"error parsing ccs HTML page: {ex}")
-                        continue
-
-                    try:
-                        instructions = soup2.find("div", {"class": "instructions"})
-                        if not instructions:
-                            raise Exception("could not parse div.instructions, page probably broken")
-                        address = instructions.find("p", {"class": "string"}).text
-                        if not address.strip():
-                            raise Exception(f"error fetching ccs HTML: could not parse address")
-                        item["address"] = address.strip()
-                    except Exception as ex:
-                        app.logger.error(f"error parsing ccs address from HTML: {ex}")
-                        continue
-                except Exception as ex:
-                    app.logger.error(f"error fetching ccs HTML: {ex}")
-                    continue
-                data.append(item)
-            except Exception as ex:
-                app.logger.error(f"error parsing a ccs item: {ex}")
+        data = [p for p in content["data"] if p["state"] == "FUNDING-REQUIRED" and p['address'] != '8Bok6rt3aCYE41d3YxfMfpSBD6rMDeV9cchSM99KwPFi5GHXe28pHXcYzqtej52TQJT4M8zhfyaoCXDoioR7nSfpC7St48K']
+        for p in data:
+            p.update({"url": settings.urls['ccs']+'/funding-required/'})
 
         await cache.set("ccs", json.dumps(data))
         return data
