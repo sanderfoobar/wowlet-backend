@@ -183,14 +183,19 @@ class FeatherApi:
         if ccs and app.config["DEBUG"]:
             return ccs
 
-        content = await httpget(f"https://ccs.getmonero.org/index.php/projects", json=True)
+        try:
+            content = await httpget(f"https://ccs.getmonero.org/index.php/projects", json=True)
 
-        data = [p for p in content["data"] if p["state"] == "FUNDING-REQUIRED" and p['address'] != '8Bok6rt3aCYE41d3YxfMfpSBD6rMDeV9cchSM99KwPFi5GHXe28pHXcYzqtej52TQJT4M8zhfyaoCXDoioR7nSfpC7St48K']
-        for p in data:
-            p.update({"url": settings.urls['ccs']+'/funding-required/'})
+            data = [p for p in content["data"] if p["state"] == "FUNDING-REQUIRED" and p['address'] != '8Bok6rt3aCYE41d3YxfMfpSBD6rMDeV9cchSM99KwPFi5GHXe28pHXcYzqtej52TQJT4M8zhfyaoCXDoioR7nSfpC7St48K']
+            for p in data:
+                p.update({"url": settings.urls['ccs']+'/funding-required/'})
 
-        await cache.set("ccs", json.dumps(data))
-        return data
+            await cache.set("ccs", json.dumps(data))
+            return data
+        except Exception as ex:
+            app.logger.error(f"Error parsing CCS data: {ex}")
+
+        return ccs
 
     @staticmethod
     async def after_ccs(data):
