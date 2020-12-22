@@ -97,9 +97,7 @@ class FeatherTask:
                     for queue in connected_websockets:
                         await queue.put({
                             "cmd": self._websocket_cmd,
-                            "data": {
-                                self._websocket_cmd: result
-                            }
+                            "data": result
                         })
 
             # optional: cache the result

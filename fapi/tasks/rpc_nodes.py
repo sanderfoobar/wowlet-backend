@@ -58,23 +58,19 @@ class RPCNodeCheckTask(FeatherTask):
                 continue
 
             # Filter out nodes affected by < v0.17.1.3 sybil attack
-            data = list(map(lambda node: node if node['target_height'] <= node['height']
-                            else self._bad_node(**node), data))
+            data = list(map(lambda _node: _node if _node['target_height'] <= _node['height']
+                            else self._bad_node(**_node), data))
 
             allowed_offset = 3
             valid_heights = []
-            current_blockheight = heights.get(network_type_coin, 0)
+            # current_blockheight = heights.get(network_type_coin, 0)
 
-            if isinstance(current_blockheight, int) and current_blockheight > 0:
-                # blockheight from cache has precedence
-                valid_heights = range(current_blockheight, current_blockheight - allowed_offset, -1)
-            else:
-                # popularity contest
-                common_height = popularity_contest([z['height'] for z in data])
-                valid_heights = range(common_height, common_height - allowed_offset, -1)
+            # popularity contest
+            common_height = popularity_contest([z['height'] for z in data])
+            valid_heights = range(common_height, common_height - allowed_offset, -1)
 
-            data = list(map(lambda node: node if node['height'] in valid_heights
-                            else self._bad_node(**node), data))
+            data = list(map(lambda _node: _node if _node['height'] in valid_heights
+                            else self._bad_node(**_node), data))
             nodes += data
         return nodes
 
