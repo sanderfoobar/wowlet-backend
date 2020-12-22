@@ -7,4 +7,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 EXPOSE 1337
-CMD ["hypercorn", "--access-logfile", "-", "--workers", "1", "--bind", "0.0.0.0:18200", "asgi:app"]
+CMD ["hypercorn", "--access-logfile", "-", "--workers", "1", "--bind", "0.0.0.0:1337", "asgi:app"]

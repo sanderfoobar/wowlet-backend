@@ -2,6 +2,7 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
+import asyncio
 import os
 import json
 from typing import List, Union
@@ -33,7 +34,7 @@ class HistoricalPriceTask(FeatherTask):
 
         self._year_genesis = int(settings.COIN_GENESIS_DATE[:4])
 
-        self._load()
+        asyncio.create_task(self._load())
 
     async def task(self) -> Union[dict, None]:
         content = await httpget(self._http_endpoint, json=True, raise_for_status=False)
