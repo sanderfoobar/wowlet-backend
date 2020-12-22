@@ -4,41 +4,46 @@
 
 import json
 import asyncio
+from typing import List, Set
+from datetime import datetime
 
 from quart import Quart
 from quart_session import Session
 import aioredis
 
+from fapi.utils import current_worker_thread_is_primary, print_banner
 import settings
 
-app = None
+now = datetime.now()
+app: Quart = None
 cache = None
-connected_websockets = set()
-api_data = {}
-user_agents = None
-txfiatdb = None
+rpc_nodes: dict = None
+user_agents: List[str] = None
+connected_websockets: Set[asyncio.Queue] = set()
+_is_primary_worker_thread = False
 
-print("""\033[91m
-  █████▒▓█████ ▄▄▄     ▄▄▄█████▓ ██░ ██ ▓█████  ██▀███  
-▓██   ▒ ▓█   ▀▒████▄   ▓  ██▒ ▓▒▓██░ ██▒▓█   ▀ ▓██ ▒ ██▒
-▒████ ░ ▒███  ▒██  ▀█▄ ▒ ▓██░ ▒░▒██▀▀██░▒███   ▓██ ░▄█ ▒
-░▓█▒  ░ ▒▓█  ▄░██▄▄▄▄██░ ▓██▓ ░ ░▓█ ░██ ▒▓█  ▄ ▒██▀▀█▄  
-░▒█░    ░▒████▒▓█   ▓██▒ ▒██▒ ░ ░▓█▒░██▓░▒████▒░██▓ ▒██▒
- ▒ ░    ░░ ▒░ ░▒▒   ▓▒█░ ▒ ░░    ▒ ░░▒░▒░░ ▒░ ░░ ▒▓ ░▒▓░
- ░       ░ ░  ░ ▒   ▒▒ ░   ░     ▒ ░▒░ ░ ░ ░  ░  ░▒ ░ ▒░
- ░ ░       ░    ░   ▒    ░       ░  ░░ ░   ░     ░░   ░ 
-           ░  ░     ░  ░         ░  ░  ░   ░  ░   ░     \033[0m
-""".strip())
+
+async def _setup_nodes(app: Quart):
+    global rpc_nodes
+    with open("data/nodes.json", "r") as f:
+        rpc_nodes = json.loads(f.read()).get(settings.COIN_SYMBOL)
+
+
+async def _setup_user_agents(app: Quart):
+    global user_agents
+    with open('data/user_agents.txt', 'r') as f:
+        user_agents = [l.strip() for l in f.readlines() if l.strip()]
 
 
 async def _setup_cache(app: Quart):
     global cache
+    # Each coin has it's own Redis DB index; `redis-cli -n $INDEX`
+    db = {"xmr": 0, "wow": 1, "aeon": 2, "trtl": 3, "msr": 4, "xhv": 5, "loki": 6}[settings.COIN_SYMBOL]
     data = {
-        "address": settings.redis_address
+        "address": settings.REDIS_ADDRESS,
+        "db": db,
+        "password": settings.REDIS_PASSWORD if settings.REDIS_PASSWORD else None
     }
-
-    if settings.redis_password:
-        data['password'] = settings.redis_password
 
     cache = await aioredis.create_redis_pool(**data)
     app.config['SESSION_TYPE'] = 'redis'
@@ -46,35 +51,66 @@ async def _setup_cache(app: Quart):
     Session(app)
 
 
+async def _setup_tasks(app: Quart):
+    """Schedules a series of tasks at an interval."""
+    if not _is_primary_worker_thread:
+        return
+
+    from fapi.tasks import (
+        BlockheightTask, HistoricalPriceTask, FundingProposalsTask,
+        CryptoRatesTask, FiatRatesTask, RedditTask, RPCNodeCheckTask,
+        XmrigTask, XmrToTask)
+
+    asyncio.create_task(BlockheightTask().start())
+    asyncio.create_task(HistoricalPriceTask().start())
+    asyncio.create_task(CryptoRatesTask().start())
+    asyncio.create_task(FiatRatesTask().start())
+    asyncio.create_task(RedditTask().start())
+    asyncio.create_task(RPCNodeCheckTask().start())
+    asyncio.create_task(XmrigTask().start())
+
+    if settings.COIN_SYMBOL in ["xmr", "wow"]:
+        asyncio.create_task(FundingProposalsTask().start())
+
+    if settings.COIN_SYMBOL == "xmr":
+        asyncio.create_task(XmrToTask().start())
+
+
+def _setup_logging():
+    from logging import Formatter
+    from logging.config import dictConfig
+    from quart.logging import default_handler
+    default_handler.setFormatter(Formatter('[%(asctime)s] %(levelname)s in %(funcName)s(): %(message)s (%(pathname)s)'))
+
+    dictConfig({
+        'version': 1,
+        'loggers': {
+            'quart.app': {
+                'level': 'DEBUG' if settings.DEBUG else 'INFO',
+            },
+        },
+    })
+
+
 def create_app():
     global app
+
+    _setup_logging()
     app = Quart(__name__)
 
     @app.before_serving
     async def startup():
-        global txfiatdb, user_agents
+        global _is_primary_worker_thread
+        _is_primary_worker_thread = current_worker_thread_is_primary()
+
+        if _is_primary_worker_thread:
+            print_banner()
+
         await _setup_cache(app)
-        loop = asyncio.get_event_loop()
+        await _setup_nodes(app)
+        await _setup_user_agents(app)
+        await _setup_tasks(app)
 
-        with open('data/nodes.json', 'r') as f:
-            nodes = json.loads(f.read())
-            cache.execute('JSON.SET', 'nodes', '.', json.dumps(nodes))
-
-        with open('data/user_agents.txt', 'r') as f:
-            user_agents = [l.strip() for l in f.readlines() if l.strip()]
-
-        from fapi.fapi import FeatherApi
-        from fapi.utils import loopyloop, TxFiatDb, XmrRig
-        txfiatdb = TxFiatDb(settings.crypto_name, settings.crypto_block_date_start)
-        loop.create_task(loopyloop(20, FeatherApi.xmrto_rates, FeatherApi.after_xmrto))
-        loop.create_task(loopyloop(120, FeatherApi.crypto_rates, FeatherApi.after_crypto))
-        loop.create_task(loopyloop(600, FeatherApi.fiat_rates, FeatherApi.after_fiat))
-        loop.create_task(loopyloop(300, FeatherApi.ccs, FeatherApi.after_ccs))
-        loop.create_task(loopyloop(900, FeatherApi.reddit, FeatherApi.after_reddit))
-        loop.create_task(loopyloop(60, FeatherApi.blockheight, FeatherApi.after_blockheight))
-        loop.create_task(loopyloop(60, FeatherApi.check_nodes, FeatherApi.after_check_nodes))
-        loop.create_task(loopyloop(43200, txfiatdb.update))
-        loop.create_task(loopyloop(43200, XmrRig.releases, XmrRig.after_releases))
         import fapi.routes
 
     return app

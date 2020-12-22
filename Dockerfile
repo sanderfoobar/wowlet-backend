@@ -1,9 +1,10 @@
 FROM python:3.7
 
+WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
 
 EXPOSE 1337
-CMD ["python3", "-u", "run.py"]
+CMD ["hypercorn", "--access-logfile", "-", "--workers", "1", "--bind", "0.0.0.0:18200", "asgi:app"]

@@ -21,5 +21,5 @@ class WebsocketParse:
         year = data.get('year')
         month = data.get('month')
 
-        from fapi.factory import txfiatdb
-        return txfiatdb.get(year, month)
+        from fapi.tasks.historical_prices import HistoricalPriceTask
+        return await HistoricalPriceTask.get(year, month)

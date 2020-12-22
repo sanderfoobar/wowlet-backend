@@ -4,39 +4,36 @@
 
 import asyncio
 import json
-from copy import deepcopy
 
 from quart import websocket, jsonify
 
 from fapi.factory import app
 from fapi.wsparse import WebsocketParse
-from fapi.utils import collect_websocket
+from fapi.utils import collect_websocket, feather_data
 
 
 @app.route("/")
 async def root():
-    from fapi.factory import api_data
-    return jsonify(api_data)
+    data = await feather_data()
+    return jsonify(data)
 
 
 @app.websocket('/ws')
 @collect_websocket
 async def ws(queue):
-    from fapi.factory import api_data
+    data = await feather_data()
 
-    # blast data on connect
-    _api_data = deepcopy(api_data)  # prevent race condition
-    for k, v in _api_data.items():
-        if not v:
+    # blast available data on connect
+    for task_key, task_value in data.items():
+        if not task_value:
             continue
-        await websocket.send(json.dumps({"cmd": k, "data": v}).encode())
-    _api_data = None
+        await websocket.send(json.dumps({"cmd": task_key, "data": task_value}).encode())
 
     async def rx():
         while True:
-            data = await websocket.receive()
+            buffer = await websocket.receive()
             try:
-                blob = json.loads(data)
+                blob = json.loads(buffer)
                 if "cmd" not in blob:
                     continue
                 cmd = blob.get('cmd')
