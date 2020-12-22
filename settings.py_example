@@ -2,29 +2,33 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
-debug = False
-host = "127.0.0.1"
-port = 1337
-redis_password = None
-redis_address = "redis://localhost"
-tor_socks = "socks5://127.0.0.1:9050"
-rpc_url = "http://127.0.0.1:18089"
-xmrchain = "https://stagenet.xmrchain.net"
+import os
+cwd = os.path.dirname(os.path.realpath(__file__))
 
-crypto_name = "monero"
-crypto_symbol = "xmr"
-crypto_block_date_start = "20140418"
 
-urls = {
-    "xmrig": "https://api.github.com/repos/xmrig/xmrig/releases",
-    "reddit": "https://www.reddit.com/r/monero/top.json?limit=100",
-    "ccs": "https://ccs.getmonero.org",
-    "fiat_rates": "https://api.exchangeratesapi.io/latest?base=USD",
-    "crypto_rates": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd",
-    "crypto_wow_rates": "https://api.coingecko.com/api/v3/simple/price?ids=wownero&vs_currencies=usd"
+def bool_env(val):
+    return val is True or (isinstance(val, str) and (val.lower() == 'true' or val == '1'))
+
+
+DEBUG = bool_env(os.environ.get("FEATHER_DEBUG", False))
+HOST = os.environ.get("FEATHER_HOST", "127.0.0.1")
+PORT = int(os.environ.get("FEATHER_PORT", 1337))
+
+REDIS_ADDRESS = os.environ.get("FEATHER_REDIS_ADDRESS", "redis://localhost")
+REDIS_PASSWORD = os.environ.get("FEATHER_REDIS_PASSWORD")
+
+COIN_NAME = os.environ.get("FEATHER_COIN_NAME", "monero").lower()  # as per coingecko
+COIN_SYMBOL = os.environ.get("FEATHER_COIN_SYMBOL", "xmr").lower()  # as per coingecko
+COIN_GENESIS_DATE = os.environ.get("FEATHER_COIN_GENESIS_DATE", "20140418")
+COIN_MODE = os.environ.get("FEATHER_COIN_MODE", "mainnet").lower()
+
+TOR_SOCKS_PROXY = os.environ.get("FEATHER_TOR_SOCKS_PROXY", "socks5://127.0.0.1:9050")
+
+# while fetching USD price from coingecko, also include these extra coins:
+CRYPTO_RATES_COINS_EXTRA = {
+    "wownero": "wow",
+    "aeon": "aeon",
+    "turtlecoin": "trtl",
+    "haven": "xhv",
+    "loki": "loki"
 }
-
-if debug:
-    urls["xmrto_rates"] = "https://test.xmr.to/api/v3/xmr2btc/order_parameter_query/"
-else:
-    urls["xmrto_rates"] = "https://xmr.to/api/v3/xmr2btc/order_parameter_query/"

@@ -1,43 +1,63 @@
 {
-  "mainnet": {
-    "tor": [
-      "fdlnlt5mr5o7lmhg.onion:18081",
-      "xmkwypann4ly64gh.onion:18081",
-      "xmrtolujkxnlinre.onion:18081",
-      "xmrag4hf5xlabmob.onion:18081",
-      "monero26mmldsallmxok2kwamne4ve3mybvvn2yijsvss7ey63hc4yyd.onion:18081",
-      "nrw57zxw5zyevn3i.onion:18081",
-      "monero5sjoz5xmjn.onion:18081",
-      "mxcd4577fldb3ppzy7obmmhnu3tf57gbcbd4qhwr2kxyjj2qi3dnbfqd.onion:18081",
-      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
-      "moneroptqodufzxj.onion:18081",
-      "3hvpnd4xejtzcuowvru2wfjum5wjf7synigm44rrizr3k4v5vzam2bad.onion:18081",
-      "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
-      "3t7v5zpcfxq2tocdofdcwxgrldco3elotz3iis4jtbbnscy5alezw7yd.onion:18081"
-    ],
-    "clearnet": [
-      "eu-west.node.xmr.pm:18089",
-      "eu-west-2.node.xmr.pm:18089",
-      "usa-east-va.node.xmr.pm:18089",
-      "canada.node.xmr.pm:18089",
-      "singapore.node.xmr.pm:18089",
-      "192.110.160.146:18089",
-      "nodes.hashvault.pro:18081",
-      "node.supportxmr.com:18081",
-      "node.imonero.org:18081",
-      "xmr-node-eu.cakewallet.com:18081",
-      "xmr-node-usa-east.cakewallet.com:18081",
-      "node.xmr.pt:18081",
-      "node.xmr.ru:18081",
-      "xmr-peer-070.cypherpunklabs.com:18081",
-      "xmr.fail:18081"
-    ]
+  "xmr": {
+    "mainnet": {
+      "tor": [
+        "fdlnlt5mr5o7lmhg.onion:18081",
+        "xmkwypann4ly64gh.onion:18081",
+        "xmrtolujkxnlinre.onion:18081",
+        "xmrag4hf5xlabmob.onion:18081",
+        "monero26mmldsallmxok2kwamne4ve3mybvvn2yijsvss7ey63hc4yyd.onion:18081",
+        "nrw57zxw5zyevn3i.onion:18081",
+        "monero5sjoz5xmjn.onion:18081",
+        "mxcd4577fldb3ppzy7obmmhnu3tf57gbcbd4qhwr2kxyjj2qi3dnbfqd.onion:18081",
+        "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
+        "moneroptqodufzxj.onion:18081",
+        "3hvpnd4xejtzcuowvru2wfjum5wjf7synigm44rrizr3k4v5vzam2bad.onion:18081",
+        "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
+        "3t7v5zpcfxq2tocdofdcwxgrldco3elotz3iis4jtbbnscy5alezw7yd.onion:18081"
+      ],
+      "clearnet": [
+        "eu-west.node.xmr.pm:18089",
+        "eu-west-2.node.xmr.pm:18089",
+        "usa-east-va.node.xmr.pm:18089",
+        "canada.node.xmr.pm:18089",
+        "singapore.node.xmr.pm:18089",
+        "192.110.160.146:18089",
+        "nodes.hashvault.pro:18081",
+        "node.supportxmr.com:18081",
+        "node.imonero.org:18081",
+        "xmr-node-eu.cakewallet.com:18081",
+        "xmr-node-usa-east.cakewallet.com:18081",
+        "node.xmr.pt:18081",
+        "node.xmr.ru:18081",
+        "xmr-peer-070.cypherpunklabs.com:18081",
+        "xmr.fail:18081"
+      ]
+    },
+    "stagenet": {
+      "tor": [],
+      "clearnet": [
+        "run.your.own.node.xmr.pm:38089",
+        "super.fast.node.xmr.pm:38089"
+      ]
+    }
   },
-  "stagenet": {
-    "tor": [],
-    "clearnet": [
-      "run.your.own.node.xmr.pm:38089",
-      "super.fast.node.xmr.pm:38089"
-    ]
+  "wow": {
+    "mainnet": {
+      "tor": [
+        "wowbuxx535x4exuexja2xfezpwcyznxkofui4ndjiectj4yuh2xheiid.onion:34568"
+      ],
+      "clearnet": [
+        "wow.pwned.systems:34568",
+        "global.wownodes.com:34568",
+        "node.suchwow.xyz:34568",
+        "super.fast.node.xmr.pm:34568",
+        "wowbux.org:34568"
+      ]
+    },
+    "stagenet": {
+      "tor": [],
+      "clearnet": []
+    }
   }
 }

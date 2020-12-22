@@ -2,55 +2,34 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
-import asyncio
 import json
+import asyncio
 import os
-import re
 import random
-from functools import wraps
 from datetime import datetime
+from collections import Counter
+from functools import wraps
+from typing import List, Union
 
+import psutil
 import aiohttp
+from aiohttp_socks import ProxyConnector
 
 import settings
 
 
-class BlockHeight:
-    @staticmethod
-    async def xmrchain(stagenet: bool = False):
-        re_blockheight = r"block\/(\d+)\"\>"
-        url = "https://stagenet.xmrchain.net/" if stagenet else "https://xmrchain.net/"
-        content = await httpget(url, json=False)
-        xmrchain = re.findall(re_blockheight, content)
-        current = max(map(int, xmrchain))
-        return current
-
-    @staticmethod
-    async def xmrto(stagenet: bool = False):
-        re_blockheight = r"block\/(\d+)\"\>"
-        url = "https://community.xmr.to/explorer/stagenet/" if stagenet else "https://community.xmr.to/explorer/mainnet/"
-        content = await httpget(url, json=False)
-        xmrchain = re.findall(re_blockheight, content)
-        current = max(map(int, xmrchain))
-        return current
-
-
-async def loopyloop(secs: int, func, after_func=None):
-    """
-    asyncio loop
-    :param secs: interval
-    :param func: function to execute
-    :param after_func: function to execute after completion
-    :return:
-    """
-    while True:
-        result = await func()
-        if after_func:
-            await after_func(result)
-
-        # randomize a bit for Tor anti fingerprint reasons
-        _secs = random.randrange(secs - 5, secs +5)
-        await asyncio.sleep(_secs)
+def print_banner():
+    print(f"""\033[91m
+      █████▒▓█████ ▄▄▄     ▄▄▄█████▓ ██░ ██ ▓█████  ██▀███  
+    ▓██   ▒ ▓█   ▀▒████▄   ▓  ██▒ ▓▒▓██░ ██▒▓█   ▀ ▓██ ▒ ██▒
+    ▒████ ░ ▒███  ▒██  ▀█▄ ▒ ▓██░ ▒░▒██▀▀██░▒███   ▓██ ░▄█ ▒
+    ░▓█▒  ░ ▒▓█  ▄░██▄▄▄▄██░ ▓██▓ ░ ░▓█ ░██ ▒▓█  ▄ ▒██▀▀█▄  
+    ░▒█░    ░▒████▒▓█   ▓██▒ ▒██▒ ░ ░▓█▒░██▓░▒████▒░██▓ ▒██▒
+     ▒ ░    ░░ ▒░ ░▒▒   ▓▒█░ ▒ ░░    ▒ ░░▒░▒░░ ▒░ ░░ ▒▓ ░▒▓░
+     ░       ░ ░  ░ ▒   ▒▒ ░   ░     ▒ ░▒░ ░ ░ ░  ░  ░▒ ░ ▒░
+     ░ ░       ░    ░   ▒    ░       ░  ░░ ░   ░     ░░   ░ 
+               ░  ░     ░  ░         ░  ░  ░   ░  ░   ░  {settings.COIN_SYMBOL}\033[0m
+    """.strip())
 
 
 def collect_websocket(func):
@@ -66,32 +45,21 @@ def collect_websocket(func):
     return wrapper
 
 
-async def broadcast_blockheight():
-    from fapi.factory import connected_websockets, api_data
-    for queue in connected_websockets:
-        await queue.put({
-            "cmd": "blockheights",
-            "data": {
-                "height": api_data.get("blockheights", {})
-            }
-        })
-
-
-async def broadcast_nodes():
-    from fapi.factory import connected_websockets, api_data
-    for queue in connected_websockets:
-        await queue.put({
-            "cmd": "nodes",
-            "data": api_data['nodes']
-        })
-
-
-async def httpget(url: str, json=True):
-    timeout = aiohttp.ClientTimeout(total=30)
+async def httpget(url: str, json=True, timeout: int = 5, socks5: str = None, raise_for_status=True):
     headers = {"User-Agent": random_agent()}
-    async with aiohttp.ClientSession(timeout=timeout) as session:
+    opts = {"timeout": aiohttp.ClientTimeout(total=timeout)}
+    if socks5:
+        opts['connector'] = ProxyConnector.from_url(socks5)
+
+    async with aiohttp.ClientSession(**opts) as session:
         async with session.get(url, headers=headers) as response:
-            return await response.json() if json else await response.text()
+            if raise_for_status:
+                response.raise_for_status()
+
+            result = await response.json() if json else await response.text()
+            if result is None or (isinstance(result, str) and result == ''):
+                raise Exception("empty response from request")
+            return result
 
 
 def random_agent():
@@ -99,129 +67,64 @@ def random_agent():
     return random.choice(user_agents)
 
 
-class TxFiatDb:
-    # historical fiat price db for given symbol
-    def __init__(self, symbol, block_date_start):
-        self.fn = "data/fiatdb"
-        self.symbol = symbol
-        self.block_start = block_date_start
-        self._url = "https://www.coingecko.com/price_charts/69/usd/max.json"
-        self.data = {}
-        self.load()
-
-    def get(self, year: int, month: int = None):
-        rtn = {}
-        if year not in self.data:
-            return
-        if not month:
-            for _m, days in self.data[year].items():
-                for day, price in days.items():
-                    rtn[datetime(year, _m, day).strftime('%Y%m%d')] = price
-            return rtn
-        if month not in self.data[year]:
-            return
-        for day, price in self.data[year][month].items():
-            rtn[datetime(year, month, day).strftime('%Y%m%d')] = price
-        return rtn
-
-    def load(self):
-        if not os.path.exists("fiatdb"):
-            return {}
-        f = open("fiatdb", "r")
-        data = f.read()
-        f.close()
+async def feather_data():
+    """A collection of data collected by
+    `FeatherTask`, for Feather wallet clients."""
+    from fapi.factory import cache, now
+    data = await cache.get("data")
+    if data:
         data = json.loads(data)
+        return data
 
-        # whatever
-        self.data = {int(k): {int(_k): {int(__k): __v for __k, __v in _v.items()} for _k, _v in v.items()} for k, v in data.items()}
+    keys = ["blockheights", "funding_proposals", "crypto_rates", "fiat_rates", "reddit", "rpc_nodes", "xmrig", "xmrto_rates"]
+    data = {keys[i]: json.loads(val) if val else None for i, val in enumerate(await cache.mget(*keys))}
 
-    def write(self):
-        f = open("fiatdb", "w")
-        f.write(json.dumps(self.data))
-        f.close()
+    # @TODO: for backward-compat reasons we're including some legacy keys which can be removed after 1.0 release
+    data['nodes'] = data['rpc_nodes']
+    data['ccs'] = data['funding_proposals']
+    data['wfs'] = data['funding_proposals']
 
-    async def update(self):
-        try:
-            content = await httpget(self._url, json=True)
-            if not "stats" in content:
-                raise Exception()
-        except Exception as ex:
-            return
-
-        stats = content.get('stats')
-        if not stats:
-            return
-
-        year_start = int(self.block_start[:4])
-        self.data = {z: {k: {} for k in range(1, 13)}
-                     for z in range(year_start, datetime.now().year + 1)}
-        content = {z[0]: z[1] for z in stats}
-
-        for k, v in content.items():
-            _date = datetime.fromtimestamp(k / 1000)
-            self.data[_date.year].setdefault(_date.month, {})
-            self.data[_date.year][_date.month][_date.day] = v
-
-        self.write()
+    # start caching when application lifetime is more than 20 seconds
+    if (datetime.now() - now).total_seconds() > 20:
+        await cache.setex("data", 30, json.dumps(data))
+    return data
 
 
-class XmrRig:
-    @staticmethod
-    async def releases():
-        from fapi.factory import app, cache
-        from fapi.fapi import FeatherApi
+def popularity_contest(lst: List[int]) -> Union[int, None]:
+    """Return most common occurrences of List[int]. If
+    there are no duplicates, return max() instead.
+    """
+    if not lst:
+        return
+    if len(set(lst)) == len(lst):
+        return max(lst)
+    return Counter(lst).most_common(1)[0][0]
 
-        blob = await FeatherApi.redis_get("xmrig_releases")
-        if blob and app.config["DEBUG"]:
-            return blob
 
-        try:
-            result = await httpget(settings.urls["xmrig"])
-            if not isinstance(result, list):
-                raise Exception("JSON response was not a list")
-            if len(result) <= 1:
-                raise Exception("JSON response list was 1 or less")
-            result = result[0]
-            await cache.set("xmrig_releases", json.dumps(result))
-            blob = result
-        except Exception as ex:
-            app.logger.error(f"error parsing xmrig blob: {ex}")
-            if blob:
-                app.logger.warning(f"passing xmrig output from cache")
-                return blob
+def current_worker_thread_is_primary() -> bool:
+    """
+    ASGI server (Hypercorn) may start multiple
+    worker threads, but we only want one feather-ws
+    instance to schedule `FeatherTask` tasks at an
+    interval. Therefor this function determines if the
+    current instance is responsible for the
+    recurring Feather tasks.
+    """
+    from fapi.factory import app
 
-        return blob
+    current_pid = os.getpid()
+    parent_pid = os.getppid()
+    app.logger.debug(f"current_pid: {current_pid}, "
+                     f"parent_pid: {parent_pid}")
 
-    @staticmethod
-    async def after_releases(data):
-        from fapi.factory import api_data
-        from dateutil.parser import parse
-        _data = []
-        for asset in data['assets']:
-            for expected in ["tar.gz", ".zip"]:
-                if asset["state"] != "uploaded":
-                    continue
-                if asset["name"].endswith(expected):
-                    _data.append(asset)
-        version = data['tag_name']
-        assets = {}
+    if parent_pid == 0:
+        return True
 
-        for asset in _data:
-            operating_system = "linux"
-            if "msvc" in asset['name'] or "win64" in asset['name']:
-                operating_system = "windows"
-            elif "macos" in asset["name"]:
-                operating_system = "macos"
+    parent = psutil.Process(parent_pid)
+    if parent.name() != "hypercorn":
+        return True
 
-            assets.setdefault(operating_system, [])
-            assets[operating_system].append({
-                "name": asset["name"],
-                "created_at": parse(asset["created_at"]).strftime("%Y-%m-%d"),
-                "url": f"https://github.com/xmrig/xmrig/releases/download/{version}/{asset['name']}",
-                "download_count": int(asset["download_count"])
-            })
+    lowest_pid = min(c.pid for c in parent.children(recursive=True) if c.name() == "hypercorn")
+    if current_pid == lowest_pid:
+        return True
 
-        api_data["xmrig"] = {
-            "version": version,
-            "assets": assets
-        }

@@ -1,34 +1,55 @@
 # feather-ws
 
-This is the back-end websocket server for Feather wallet.
+Back-end websocket server for Feather wallet.
 
-- Python 3 asyncio
-- Quart web framework
+- Quart web framework, Py3 asyncio
 - Redis
 
+## Coins supported
 
-### Supervisor
+- Monero
+- Wownero
 
-Example config.
+See also the environment variables `FEATHER_COIN_NAME`, `FEATHER_COIN_SYMBOL`, etc. in `settings.py`.
 
-```text
-[program:ws]
-directory=/home/feather/feather-ws
-command=/home/feather/feather-ws/venv/bin/python run.py
-autostart=true
-autorestart=true
-startsecs=6
-stdout_logfile=/home/feather/feather-ws/stdout.log
-stdout_logfile_maxbytes=1MB
-stdout_logfile_backups=10
-stdout_capture_maxbytes=1MB
-stderr_logfile=/home/feather/feather-ws/stderr.log
-stderr_logfile_maxbytes=1MB
-stderr_logfile_backups=10
-stderr_capture_maxbytes=1MB
-user = feather
-environment=
-    HOME="/home/feather",
-    USER="feather",
-    PATH="/home/feather/feather-ws/venv/bin"
+## Tasks
+
+This websocket server has several scheduled recurring tasks:
+
+- Fetch latest blockheight from various block explorers
+- Fetch crypto/fiat exchange rates
+- Fetch latest Reddit posts
+- Fetch funding proposals
+- Check status of RPC nodes (`data/nodes.json`)
+
+When Feather wallet starts up, it will connect to
+this websocket server and receive the information
+listed above which is necessary for normal operation.
+
+See `fapi.tasks.*` for the various tasks.
+
+## Development
+
+Requires Python 3.7 and higher.
+
 ```
+virtualenv -p /usr/bin/python3 venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+export FEATHER_DEBUG=true
+python run.py
+```
+
+Note that `run.py` is meant as a development server. For production,
+use `asgi.py` with something like hypercorn.
+
+## Docker
+
+In production you may run via docker;
+
+```
+docker-compose up
+```
+
+Will bind on `http://127.0.0.1:1337`. Modify `docker-compose.yml` if necessary.

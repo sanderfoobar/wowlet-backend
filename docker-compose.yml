@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+    command: redis-server
+    environment:
+      - REDIS_REPLICATION_MODE=master
+  tor-node:
+    image: osminogin/tor-simple
+    restart: always
+  feather-ws:
+    container_name: feather-ws
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - FEATHER_DEBUG=false
+      - FEATHER_PORT=1337
+      - FEATHER_REDIS_ADDRESS=redis://redis
+      - FEATHER_TOR_SOCKS_PROXY=socks5://tor-node:9050
+      - FEATHER_COIN_NAME=monero
+      - FEATHER_COIN_SYMBOL=xmr
+      - FEATHER_COIN_MODE=mainnet
+    ports:
+        - "1337:1337"
