@@ -47,7 +47,8 @@ class RedditTask(FeatherTask):
         blob = [{
             'title': z['data']['title'],
             'author': z['data']['author'],
-            'url': "https://old.reddit.com" + z['data']['permalink'],
+            'url': "https://old.reddit.com" + z['data']['permalink'],  # legacy
+            'permalink': z['data']['permalink'],
             'comments': z['data']['num_comments']
         } for z in blob['data']['children']]
         if not blob:
