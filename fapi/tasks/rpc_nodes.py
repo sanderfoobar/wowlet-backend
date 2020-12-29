@@ -24,12 +24,14 @@ class RPCNodeCheckTask(FeatherTask):
 
     async def task(self) -> List[dict]:
         """Check RPC nodes status"""
-        from fapi.factory import app, rpc_nodes, cache
+        from fapi.factory import app, cache
 
         try:
             heights = json.loads(await cache.get("blockheights"))
         except:
             heights = {}
+
+        rpc_nodes = await self.cache_json_get("nodes")
 
         nodes = []
         for network_type_coin, _ in rpc_nodes.items():
