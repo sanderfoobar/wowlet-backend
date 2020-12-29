@@ -69,7 +69,7 @@ class RPCNodeCheckTask(FeatherTask):
 
             # popularity contest
             common_height = popularity_contest([z['height'] for z in data])
-            valid_heights = range(common_height, common_height - allowed_offset, -1)
+            valid_heights = range(common_height + allowed_offset, common_height - allowed_offset, -1)
 
             data = list(map(lambda _node: _node if _node['height'] in valid_heights
                             else self._bad_node(**_node), data))
