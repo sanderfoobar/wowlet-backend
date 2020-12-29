@@ -123,6 +123,16 @@ class FeatherTask:
     async def end(self, result: dict):
         raise NotImplementedError()
 
+    async def cache_json_get(self, key: str, path="."):
+        from fapi.factory import app, cache
+
+        try:
+            data = await cache.execute('JSON.GET', key, path)
+            if data:
+                return json.loads(data)
+        except Exception as ex:
+            app.logger.error(f"Redis error: {ex}")
+
     async def cache_get(self, key: str) -> dict:
         from fapi.factory import app, cache
 

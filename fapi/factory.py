@@ -17,16 +17,16 @@ import settings
 now = datetime.now()
 app: Quart = None
 cache = None
-rpc_nodes: dict = None
 user_agents: List[str] = None
 connected_websockets: Set[asyncio.Queue] = set()
 _is_primary_worker_thread = False
 
 
 async def _setup_nodes(app: Quart):
-    global rpc_nodes
-    with open("data/nodes.json", "r") as f:
-        rpc_nodes = json.loads(f.read()).get(settings.COIN_SYMBOL)
+    global cache
+    with open('data/nodes.json', 'r') as f:
+        nodes = json.loads(f.read()).get(settings.COIN_SYMBOL)
+        cache.execute('JSON.SET', 'nodes', '.', json.dumps(nodes))
 
 
 async def _setup_user_agents(app: Quart):
