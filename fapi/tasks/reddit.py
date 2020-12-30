@@ -2,6 +2,7 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
+import html
 import settings
 from fapi.utils import httpget
 from fapi.tasks import FeatherTask
@@ -45,7 +46,7 @@ class RedditTask(FeatherTask):
             raise
 
         blob = [{
-            'title': z['data']['title'],
+            'title': html.unescape(z['data']['title']),
             'author': z['data']['author'],
             'url': "https://old.reddit.com" + z['data']['permalink'],  # legacy
             'permalink': z['data']['permalink'],
