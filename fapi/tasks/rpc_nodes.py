@@ -44,12 +44,12 @@ class RPCNodeCheckTask(FeatherTask):
                         data.append(blob)
                     except Exception as ex:
                         app.logger.warning(f"node {node} not reachable; {ex}")
-                        data.append(self._bad_node(**{
+                        data.append(self._bad_node({
                             "address": node,
                             "nettype": network_type_coin,
                             "type": network_type,
                             "height": 0
-                        }))
+                        }, reason="unreachable"))
 
             # not neccesary for stagenet/testnet nodes to be validated
             if network_type_coin != "mainnet":
@@ -61,18 +61,18 @@ class RPCNodeCheckTask(FeatherTask):
 
             # Filter out nodes affected by < v0.17.1.3 sybil attack
             data = list(map(lambda _node: _node if _node['target_height'] <= _node['height']
-                            else self._bad_node(**_node), data))
+                            else self._bad_node(_node, reason="+2_attack"), data))
 
             allowed_offset = 3
             valid_heights = []
             # current_blockheight = heights.get(network_type_coin, 0)
 
             # popularity contest
-            common_height = popularity_contest([z['height'] for z in data])
+            common_height = popularity_contest([z['height'] for z in data if z['height'] != 0])
             valid_heights = range(common_height + allowed_offset, common_height - allowed_offset, -1)
 
             data = list(map(lambda _node: _node if _node['height'] in valid_heights
-                            else self._bad_node(**_node), data))
+                            else self._bad_node(_node, reason="out_of_sync"), data))
             nodes += data
         return nodes
 
@@ -104,12 +104,13 @@ class RPCNodeCheckTask(FeatherTask):
             "type": network_type
         }
 
-    def _bad_node(self, **kwargs):
+    def _bad_node(self, node: dict, reason=""):
         return {
-            "address": kwargs['address'],
-            "height": kwargs['height'],
+            "address": node['address'],
+            "height": node['height'],
             "target_height": 0,
             "online": False,
-            "nettype": kwargs['nettype'],
-            "type": kwargs['type']
+            "nettype": node['nettype'],
+            "type": node['type'],
+            "reason": reason
         }
