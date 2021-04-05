@@ -4,13 +4,13 @@
 
 import html
 import settings
-from fapi.utils import httpget
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget
+from wowlet_backend.tasks import FeatherTask
 
 
 class RedditTask(FeatherTask):
     def __init__(self, interval: int = 900):
-        from fapi.factory import app
+        from wowlet_backend.factory import app
         super(RedditTask, self).__init__(interval)
 
         self._cache_key = "reddit"
@@ -36,7 +36,7 @@ class RedditTask(FeatherTask):
             self._http_endpoint = self._http_endpoint[:-1]
 
     async def task(self):
-        from fapi.factory import app
+        from wowlet_backend.factory import app
 
         url = f"{self._http_endpoint}/new.json?limit=15"
         try:

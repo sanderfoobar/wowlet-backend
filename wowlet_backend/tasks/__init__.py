@@ -39,7 +39,7 @@ class FeatherTask:
         self._running = False
 
     async def start(self, *args, **kwargs):
-        from fapi.factory import app, connected_websockets
+        from wowlet_backend.factory import app, connected_websockets
         if not self._active:
             # invalid task
             return
@@ -124,7 +124,7 @@ class FeatherTask:
         raise NotImplementedError()
 
     async def cache_json_get(self, key: str, path="."):
-        from fapi.factory import app, cache
+        from wowlet_backend.factory import app, cache
 
         try:
             data = await cache.execute('JSON.GET', key, path)
@@ -134,7 +134,7 @@ class FeatherTask:
             app.logger.error(f"Redis error: {ex}")
 
     async def cache_get(self, key: str) -> dict:
-        from fapi.factory import app, cache
+        from wowlet_backend.factory import app, cache
 
         try:
             data = await cache.get(key)
@@ -145,7 +145,7 @@ class FeatherTask:
             app.logger.error(f"Redis GET error with key '{key}': {ex}")
 
     async def cache_set(self, key, val: Union[dict, int], expiry: int = 0) -> bool:
-        from fapi.factory import app, cache
+        from wowlet_backend.factory import app, cache
         try:
             data = json.dumps(val)
             if isinstance(expiry, int) and expiry > 0:
@@ -157,12 +157,12 @@ class FeatherTask:
             app.logger.error(f"Redis SET error with key '{key}': {ex}")
 
 
-from fapi.tasks.proposals import FundingProposalsTask
-from fapi.tasks.historical_prices import HistoricalPriceTask
-from fapi.tasks.blockheight import BlockheightTask
-from fapi.tasks.rates_fiat import FiatRatesTask
-from fapi.tasks.rates_crypto import CryptoRatesTask
-from fapi.tasks.reddit import RedditTask
-from fapi.tasks.rpc_nodes import RPCNodeCheckTask
-from fapi.tasks.xmrig import XmrigTask
-from fapi.tasks.xmrto import XmrToTask
+from wowlet_backend.tasks.proposals import FundingProposalsTask
+from wowlet_backend.tasks.historical_prices import HistoricalPriceTask
+from wowlet_backend.tasks.blockheight import BlockheightTask
+from wowlet_backend.tasks.rates_fiat import FiatRatesTask
+from wowlet_backend.tasks.rates_crypto import CryptoRatesTask
+from wowlet_backend.tasks.reddit import RedditTask
+from wowlet_backend.tasks.rpc_nodes import RPCNodeCheckTask
+from wowlet_backend.tasks.xmrig import XmrigTask
+from wowlet_backend.tasks.xmrto import XmrToTask

@@ -6,14 +6,14 @@ from bs4 import BeautifulSoup
 from typing import List
 
 import settings
-from fapi.utils import httpget
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget
+from wowlet_backend.tasks import FeatherTask
 
 
 class FundingProposalsTask(FeatherTask):
     """Fetch funding proposals made by the community."""
     def __init__(self, interval: int = 600):
-        from fapi.factory import app
+        from wowlet_backend.factory import app
         super(FundingProposalsTask, self).__init__(interval)
 
         self._cache_key = "funding_proposals"
@@ -58,7 +58,7 @@ class FundingProposalsTask(FeatherTask):
         # - API does not allow filtering
         # - API sometimes breaks; https://hackerone.com/reports/934231
         # we'll web scrape instead
-        from fapi.factory import app
+        from wowlet_backend.factory import app
 
         content = await httpget(f"{self._http_endpoint}/funding-required/", json=False)
         soup = BeautifulSoup(content, "html.parser")

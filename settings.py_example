@@ -10,19 +10,19 @@ def bool_env(val):
     return val is True or (isinstance(val, str) and (val.lower() == 'true' or val == '1'))
 
 
-DEBUG = bool_env(os.environ.get("FEATHER_DEBUG", False))
-HOST = os.environ.get("FEATHER_HOST", "127.0.0.1")
-PORT = int(os.environ.get("FEATHER_PORT", 1337))
+DEBUG = bool_env(os.environ.get("WOWLET_DEBUG", False))
+HOST = os.environ.get("WOWLET_HOST", "127.0.0.1")
+PORT = int(os.environ.get("WOWLET_PORT", 1337))
 
-REDIS_ADDRESS = os.environ.get("FEATHER_REDIS_ADDRESS", "redis://localhost")
-REDIS_PASSWORD = os.environ.get("FEATHER_REDIS_PASSWORD")
+REDIS_ADDRESS = os.environ.get("WOWLET_REDIS_ADDRESS", "redis://localhost")
+REDIS_PASSWORD = os.environ.get("WOWLET_REDIS_PASSWORD")
 
-COIN_NAME = os.environ.get("FEATHER_COIN_NAME", "monero").lower()  # as per coingecko
-COIN_SYMBOL = os.environ.get("FEATHER_COIN_SYMBOL", "xmr").lower()  # as per coingecko
-COIN_GENESIS_DATE = os.environ.get("FEATHER_COIN_GENESIS_DATE", "20140418")
-COIN_MODE = os.environ.get("FEATHER_COIN_MODE", "mainnet").lower()
+COIN_NAME = os.environ.get("WOWLET_COIN_NAME", "monero").lower()  # as per coingecko
+COIN_SYMBOL = os.environ.get("WOWLET_COIN_SYMBOL", "xmr").lower()  # as per coingecko
+COIN_GENESIS_DATE = os.environ.get("WOWLET_COIN_GENESIS_DATE", "20140418")
+COIN_MODE = os.environ.get("WOWLET_COIN_MODE", "mainnet").lower()
 
-TOR_SOCKS_PROXY = os.environ.get("FEATHER_TOR_SOCKS_PROXY", "socks5://127.0.0.1:9050")
+TOR_SOCKS_PROXY = os.environ.get("WOWLET_TOR_SOCKS_PROXY", "socks5://127.0.0.1:9050")
 
 # while fetching USD price from coingecko, also include these extra coins:
 CRYPTO_RATES_COINS_EXTRA = {

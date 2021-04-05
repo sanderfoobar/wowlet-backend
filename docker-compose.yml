@@ -16,12 +16,12 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - FEATHER_DEBUG=false
-      - FEATHER_PORT=1337
-      - FEATHER_REDIS_ADDRESS=redis://redis
-      - FEATHER_TOR_SOCKS_PROXY=socks5://tor-node:9050
-      - FEATHER_COIN_NAME=monero
-      - FEATHER_COIN_SYMBOL=xmr
-      - FEATHER_COIN_MODE=mainnet
+      - WOWLET_DEBUG=false
+      - WOWLET_PORT=1337
+      - WOWLET_REDIS_ADDRESS=redis://redis
+      - WOWLET_TOR_SOCKS_PROXY=socks5://tor-node:9050
+      - WOWLET_COIN_NAME=monero
+      - WOWLET_COIN_SYMBOL=xmr
+      - WOWLET_COIN_MODE=mainnet
     ports:
         - "1337:1337"

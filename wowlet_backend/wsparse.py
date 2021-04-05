@@ -21,5 +21,5 @@ class WebsocketParse:
         year = data.get('year')
         month = data.get('month')
 
-        from fapi.tasks.historical_prices import HistoricalPriceTask
+        from wowlet_backend.tasks.historical_prices import HistoricalPriceTask
         return await HistoricalPriceTask.get(year, month)

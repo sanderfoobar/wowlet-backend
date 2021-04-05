@@ -2,8 +2,8 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
-from fapi.utils import httpget
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget
+from wowlet_backend.tasks import FeatherTask
 
 
 class FiatRatesTask(FeatherTask):

@@ -5,8 +5,8 @@
 from dateutil.parser import parse
 
 import settings
-from fapi.utils import httpget
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget
+from wowlet_backend.tasks import FeatherTask
 
 
 class XmrigTask(FeatherTask):

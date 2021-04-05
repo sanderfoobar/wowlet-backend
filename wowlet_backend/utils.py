@@ -35,7 +35,7 @@ def print_banner():
 def collect_websocket(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        from fapi.factory import connected_websockets
+        from wowlet_backend.factory import connected_websockets
         queue = asyncio.Queue()
         connected_websockets.add(queue)
         try:
@@ -63,14 +63,14 @@ async def httpget(url: str, json=True, timeout: int = 5, socks5: str = None, rai
 
 
 def random_agent():
-    from fapi.factory import user_agents
+    from wowlet_backend.factory import user_agents
     return random.choice(user_agents)
 
 
 async def feather_data():
     """A collection of data collected by
     `FeatherTask`, for Feather wallet clients."""
-    from fapi.factory import cache, now
+    from wowlet_backend.factory import cache, now
     data = await cache.get("data")
     if data:
         data = json.loads(data)
@@ -110,7 +110,7 @@ def current_worker_thread_is_primary() -> bool:
     current instance is responsible for the
     recurring Feather tasks.
     """
-    from fapi.factory import app
+    from wowlet_backend.factory import app
 
     current_pid = os.getpid()
     parent_pid = os.getppid()

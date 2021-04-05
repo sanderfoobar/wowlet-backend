@@ -8,8 +8,8 @@ from collections import Counter
 from functools import partial
 
 import settings
-from fapi.utils import httpget, popularity_contest
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget, popularity_contest
+from wowlet_backend.tasks import FeatherTask
 
 
 class BlockheightTask(FeatherTask):
@@ -81,7 +81,7 @@ class BlockheightTask(FeatherTask):
         }
 
     async def task(self) -> Union[dict, None]:
-        from fapi.factory import app
+        from wowlet_backend.factory import app
         coin_network_types = ["mainnet", "stagenet", "testnet"]
         data = {t: 0 for t in coin_network_types}
 

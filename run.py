@@ -2,7 +2,7 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
-from fapi.factory import create_app
+from wowlet_backend.factory import create_app
 import settings
 
 app = create_app()

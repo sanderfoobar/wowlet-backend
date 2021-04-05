@@ -3,8 +3,8 @@
 # Copyright (c) 2020, dsc@xmr.pm
 
 import settings
-from fapi.utils import httpget
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget
+from wowlet_backend.tasks import FeatherTask
 
 
 class XmrToTask(FeatherTask):

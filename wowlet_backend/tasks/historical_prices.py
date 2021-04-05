@@ -11,8 +11,8 @@ from datetime import datetime
 import aiofiles
 
 import settings
-from fapi.utils import httpget
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget
+from wowlet_backend.tasks import FeatherTask
 
 
 class HistoricalPriceTask(FeatherTask):
@@ -91,7 +91,7 @@ class HistoricalPriceTask(FeatherTask):
         """This function is called when a Feather wallet client asks
         for (a range of) historical fiat information. It returns the
         data filtered by the parameters."""
-        from fapi.factory import cache
+        from wowlet_backend.factory import cache
 
         blob = await cache.get("historical_fiat")
         blob = json.loads(blob)

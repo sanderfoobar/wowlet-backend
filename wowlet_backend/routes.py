@@ -7,9 +7,9 @@ import json
 
 from quart import websocket, jsonify
 
-from fapi.factory import app
-from fapi.wsparse import WebsocketParse
-from fapi.utils import collect_websocket, feather_data
+from wowlet_backend.factory import app
+from wowlet_backend.wsparse import WebsocketParse
+from wowlet_backend.utils import collect_websocket, feather_data
 
 
 @app.route("/")

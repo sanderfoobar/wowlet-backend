@@ -6,8 +6,8 @@ import json
 from typing import List
 
 import settings
-from fapi.utils import httpget, popularity_contest
-from fapi.tasks import FeatherTask
+from wowlet_backend.utils import httpget, popularity_contest
+from wowlet_backend.tasks import FeatherTask
 
 
 class RPCNodeCheckTask(FeatherTask):
@@ -24,7 +24,7 @@ class RPCNodeCheckTask(FeatherTask):
 
     async def task(self) -> List[dict]:
         """Check RPC nodes status"""
-        from fapi.factory import app, cache
+        from wowlet_backend.factory import app, cache
 
         try:
             heights = json.loads(await cache.get("blockheights"))

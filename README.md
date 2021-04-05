@@ -10,7 +10,7 @@ Back-end websocket server for Feather wallet.
 - Monero
 - Wownero
 
-See also the environment variables `FEATHER_COIN_NAME`, `FEATHER_COIN_SYMBOL`, etc. in `settings.py`.
+See also the environment variables `WOWLET_COIN_NAME`, `WOWLET_COIN_SYMBOL`, etc. in `settings.py`.
 
 ## Tasks
 
@@ -26,7 +26,7 @@ When Feather wallet starts up, it will connect to
 this websocket server and receive the information
 listed above which is necessary for normal operation.
 
-See `fapi.tasks.*` for the various tasks.
+See `wowlet_backend.tasks.*` for the various tasks.
 
 ## Development
 
@@ -37,7 +37,7 @@ virtualenv -p /usr/bin/python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-export FEATHER_DEBUG=true
+export WOWLET_DEBUG=true
 python run.py
 ```
 

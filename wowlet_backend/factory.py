@@ -11,7 +11,7 @@ from quart import Quart
 from quart_session import Session
 import aioredis
 
-from fapi.utils import current_worker_thread_is_primary, print_banner
+from wowlet_backend.utils import current_worker_thread_is_primary, print_banner
 import settings
 
 now = datetime.now()
@@ -56,7 +56,7 @@ async def _setup_tasks(app: Quart):
     if not _is_primary_worker_thread:
         return
 
-    from fapi.tasks import (
+    from wowlet_backend.tasks import (
         BlockheightTask, HistoricalPriceTask, FundingProposalsTask,
         CryptoRatesTask, FiatRatesTask, RedditTask, RPCNodeCheckTask,
         XmrigTask, XmrToTask)
@@ -71,9 +71,6 @@ async def _setup_tasks(app: Quart):
 
     if settings.COIN_SYMBOL in ["xmr", "wow"]:
         asyncio.create_task(FundingProposalsTask().start())
-
-    if settings.COIN_SYMBOL == "xmr":
-        asyncio.create_task(XmrToTask().start())
 
 
 def _setup_logging():
@@ -111,6 +108,6 @@ def create_app():
         await _setup_user_agents(app)
         await _setup_tasks(app)
 
-        import fapi.routes
+        import wowlet_backend.routes
 
     return app
