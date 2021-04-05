@@ -2,11 +2,13 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
+import os
 import asyncio
 import json
 
-from quart import websocket, jsonify
+from quart import websocket, jsonify, send_from_directory
 
+import settings
 from wowlet_backend.factory import app
 from wowlet_backend.wsparse import WebsocketParse
 from wowlet_backend.utils import collect_websocket, feather_data
@@ -16,6 +18,13 @@ from wowlet_backend.utils import collect_websocket, feather_data
 async def root():
     data = await feather_data()
     return jsonify(data)
+
+
+@app.route("/suchwow/<path:name>")
+async def suchwow(name: str):
+    """Download a SuchWow.xyz image"""
+    base = os.path.join(settings.cwd, "data", "suchwow")
+    return await send_from_directory(base, name)
 
 
 @app.websocket('/ws')

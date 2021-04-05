@@ -10,10 +10,12 @@ from datetime import datetime
 from collections import Counter
 from functools import wraps
 from typing import List, Union
+from io import BytesIO
 
 import psutil
 import aiohttp
 from aiohttp_socks import ProxyConnector
+from PIL import Image
 
 import settings
 
@@ -79,7 +81,7 @@ async def feather_data():
         data = json.loads(data)
         return data
 
-    keys = ["blockheights", "funding_proposals", "crypto_rates", "fiat_rates", "reddit", "rpc_nodes", "xmrig", "xmrto_rates"]
+    keys = ["blockheights", "funding_proposals", "crypto_rates", "fiat_rates", "reddit", "rpc_nodes", "xmrig", "xmrto_rates", "suchwow"]
     data = {keys[i]: json.loads(val) if val else None for i, val in enumerate(await cache.mget(*keys))}
 
     # @TODO: for backward-compat reasons we're including some legacy keys which can be removed after 1.0 release
@@ -131,3 +133,27 @@ def current_worker_thread_is_primary() -> bool:
     if current_pid == lowest_pid:
         return True
 
+
+async def image_resize(buffer: bytes, max_bounding_box: int = 512, quality: int = 70) -> bytes:
+    """
+    - Resize if the image is too large
+    - PNG -> JPEG
+    - Removes EXIF
+    """
+    buffer = BytesIO(buffer)
+    buffer.seek(0)
+    image = Image.open(buffer)
+    image = image.convert('RGB')
+
+    if max([image.height, image.width]) > max_bounding_box:
+        image.thumbnail((max_bounding_box, max_bounding_box), Image.BICUBIC)
+
+    data = list(image.getdata())
+    image_without_exif = Image.new(image.mode, image.size)
+    image_without_exif.putdata(data)
+
+    buffer = BytesIO()
+    image_without_exif.save(buffer, "JPEG", quality=quality)
+    buffer.seek(0)
+
+    return buffer.read()

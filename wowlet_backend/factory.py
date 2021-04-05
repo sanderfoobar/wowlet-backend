@@ -59,7 +59,7 @@ async def _setup_tasks(app: Quart):
     from wowlet_backend.tasks import (
         BlockheightTask, HistoricalPriceTask, FundingProposalsTask,
         CryptoRatesTask, FiatRatesTask, RedditTask, RPCNodeCheckTask,
-        XmrigTask, XmrToTask)
+        XmrigTask, SuchWowTask)
 
     asyncio.create_task(BlockheightTask().start())
     asyncio.create_task(HistoricalPriceTask().start())
@@ -68,6 +68,7 @@ async def _setup_tasks(app: Quart):
     asyncio.create_task(RedditTask().start())
     asyncio.create_task(RPCNodeCheckTask().start())
     asyncio.create_task(XmrigTask().start())
+    asyncio.create_task(SuchWowTask().start())
 
     if settings.COIN_SYMBOL in ["xmr", "wow"]:
         asyncio.create_task(FundingProposalsTask().start())

@@ -10,7 +10,7 @@ from wowlet_backend.tasks import FeatherTask
 
 
 class FiatRatesTask(FeatherTask):
-    def __init__(self, interval: int = 600):
+    def __init__(self, interval: int = 43200):
         super(FiatRatesTask, self).__init__(interval)
 
         self._cache_key = "fiat_rates"

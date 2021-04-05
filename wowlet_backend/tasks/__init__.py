@@ -127,7 +127,7 @@ class FeatherTask:
         from wowlet_backend.factory import app, cache
 
         try:
-            data = await cache.execute('JSON.GET', key, path)
+            data = await cache.get(key)
             if data:
                 return json.loads(data)
         except Exception as ex:
@@ -165,4 +165,4 @@ from wowlet_backend.tasks.rates_crypto import CryptoRatesTask
 from wowlet_backend.tasks.reddit import RedditTask
 from wowlet_backend.tasks.rpc_nodes import RPCNodeCheckTask
 from wowlet_backend.tasks.xmrig import XmrigTask
-from wowlet_backend.tasks.xmrto import XmrToTask
+from wowlet_backend.tasks.suchwow import SuchWowTask
