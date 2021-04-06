@@ -26,7 +26,7 @@ async def _setup_nodes(app: Quart):
     global cache
     with open('data/nodes.json', 'r') as f:
         nodes = json.loads(f.read()).get(settings.COIN_SYMBOL)
-        cache.execute('JSON.SET', 'nodes', '.', json.dumps(nodes))
+        await cache.set('nodes', json.dumps(nodes).encode())
 
 
 async def _setup_user_agents(app: Quart):

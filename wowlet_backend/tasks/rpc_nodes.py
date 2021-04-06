@@ -32,6 +32,8 @@ class RPCNodeCheckTask(FeatherTask):
             heights = {}
 
         rpc_nodes = await self.cache_json_get("nodes")
+        if not rpc_nodes:
+            rpc_nodes = {}
 
         nodes = []
         for network_type_coin, _ in rpc_nodes.items():

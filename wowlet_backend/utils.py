@@ -2,6 +2,7 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
+import re
 import json
 import asyncio
 import os
@@ -18,6 +19,9 @@ from aiohttp_socks import ProxyConnector
 from PIL import Image
 
 import settings
+
+
+RE_ADDRESS = r"^[a-zA-Z0-9]{97}$"
 
 
 def print_banner():
