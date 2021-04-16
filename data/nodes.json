@@ -5,11 +5,17 @@
         "wowbuxx535x4exuexja2xfezpwcyznxkofui4ndjiectj4yuh2xheiid.onion:34568"
       ],
       "clearnet": [
-        "wow.pwned.systems:34568",
         "global.wownodes.com:34568",
-        "node.suchwow.xyz:34568",
         "super.fast.node.xmr.pm:34568",
-        "wowbux.org:34568"
+        "node.wownero.club:34568",
+        "node.suchwow.xyz:34568",
+        "eu-west-1.wow.xmr.pm:34568",
+        "eu-west-2.wow.xmr.pm:34568",
+        "eu-west-3.wow.xmr.pm:34568",
+        "eu-west-4.wow.xmr.pm:34568",
+        "eu-west-5.wow.xmr.pm:34568",
+        "eu-west-6.wow.xmr.pm:34568",
+        "wow.pwned.systems:34568"
       ]
     },
     "stagenet": {

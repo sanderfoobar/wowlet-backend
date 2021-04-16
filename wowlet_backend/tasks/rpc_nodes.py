@@ -62,8 +62,8 @@ class RPCNodeCheckTask(FeatherTask):
                 continue
 
             # Filter out nodes affected by < v0.17.1.3 sybil attack
-            data = list(map(lambda _node: _node if _node['target_height'] <= _node['height']
-                            else self._bad_node(_node, reason="+2_attack"), data))
+#            data = list(map(lambda _node: _node if _node['target_height'] <= _node['height']
+#                            else self._bad_node(_node, reason="+2_attack"), data))
 
             allowed_offset = 3
             valid_heights = []
