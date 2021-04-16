@@ -1,14 +1,9 @@
-# feather-ws
+# wowlet-backend
 
-Back-end websocket server for Feather wallet.
+Back-end websocket server for wowlet.
 
 - Quart web framework, Py3 asyncio
 - Redis
-
-## Coins supported
-
-- Monero
-- Wownero
 
 See also the environment variables `WOWLET_COIN_NAME`, `WOWLET_COIN_SYMBOL`, etc. in `settings.py`.
 
@@ -22,9 +17,10 @@ This websocket server has several scheduled recurring tasks:
 - Fetch funding proposals
 - Check status of RPC nodes (`data/nodes.json`)
 
-When Feather wallet starts up, it will connect to
-this websocket server and receive the information
-listed above which is necessary for normal operation.
+When Wowlet (the wallet application) starts up, it 
+will connect to this websocket server and receive 
+the information listed above which is necessary 
+for normal operation.
 
 See `wowlet_backend.tasks.*` for the various tasks.
 
