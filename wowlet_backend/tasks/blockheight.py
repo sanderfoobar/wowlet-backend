@@ -9,10 +9,10 @@ from functools import partial
 
 import settings
 from wowlet_backend.utils import httpget, popularity_contest
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class BlockheightTask(FeatherTask):
+class BlockheightTask(WowletTask):
     """
     Fetch latest blockheight using webcrawling. We pick the most popular
     height from a list of websites. Arguably this approach has benefits

@@ -12,10 +12,10 @@ import aiofiles
 
 import settings
 from wowlet_backend.utils import httpget
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class HistoricalPriceTask(FeatherTask):
+class HistoricalPriceTask(WowletTask):
     """
     This class manages a historical price (USD) database, saved in a
     textfile at `self._path`. A Feather wallet instance will ask

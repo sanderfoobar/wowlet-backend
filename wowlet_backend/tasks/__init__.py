@@ -8,7 +8,7 @@ import random
 from typing import Union
 
 
-class FeatherTask:
+class WowletTask:
     """
     The base class of many recurring tasks for this
     project. This abstracts away some functionality:

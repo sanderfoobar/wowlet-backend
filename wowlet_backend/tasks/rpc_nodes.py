@@ -7,10 +7,10 @@ from typing import List
 
 import settings
 from wowlet_backend.utils import httpget, popularity_contest
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class RPCNodeCheckTask(FeatherTask):
+class RPCNodeCheckTask(WowletTask):
     def __init__(self, interval: int = 60):
         super(RPCNodeCheckTask, self).__init__(interval)
 
