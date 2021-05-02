@@ -6,10 +6,10 @@ from typing import List, Union
 
 import settings
 from wowlet_backend.utils import httpget
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class CryptoRatesTask(FeatherTask):
+class CryptoRatesTask(WowletTask):
     def __init__(self, interval: int = 180):
         super(CryptoRatesTask, self).__init__(interval)
 

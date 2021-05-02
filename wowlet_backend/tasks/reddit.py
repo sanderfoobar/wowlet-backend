@@ -5,10 +5,10 @@
 import html
 import settings
 from wowlet_backend.utils import httpget
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class RedditTask(FeatherTask):
+class RedditTask(WowletTask):
     def __init__(self, interval: int = 900):
         from wowlet_backend.factory import app
         super(RedditTask, self).__init__(interval)

@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 import re
 
 from wowlet_backend.utils import httpget
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class FiatRatesTask(FeatherTask):
+class FiatRatesTask(WowletTask):
     def __init__(self, interval: int = 43200):
         super(FiatRatesTask, self).__init__(interval)
 

@@ -14,11 +14,11 @@ from bs4 import BeautifulSoup
 
 import settings
 from wowlet_backend.utils import httpget, image_resize
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class SuchWowTask(FeatherTask):
-    def __init__(self, interval: int = 600):
+class SuchWowTask(WowletTask):
+    def __init__(self, interval: int = 300):
         """
         This task is specifically for Wownero - fetching a listing
         of recent SuchWow submissions.
@@ -31,15 +31,16 @@ class SuchWowTask(FeatherTask):
         self._http_endpoint = "https://suchwow.xyz/"
         self._tmp_dir = os.path.join(settings.cwd, "data", "suchwow")
 
+        self._websocket_cmd = "suchwow"
+
         if not os.path.exists(self._tmp_dir):
             os.mkdir(self._tmp_dir)
 
     async def task(self):
         from wowlet_backend.factory import app
-        result = await httpget(f"{self._http_endpoint}api/list", json=True)
+        result = await httpget(f"{self._http_endpoint}api/list?limit=15&offset=0", json=True)
 
         result = list(sorted(result, key=lambda k: k['id'], reverse=True))
-        result = result[:15]
 
         for post in result:
             post_id = int(post['id'])

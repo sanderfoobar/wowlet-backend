@@ -7,10 +7,10 @@ from typing import List
 
 import settings
 from wowlet_backend.utils import httpget
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class FundingProposalsTask(FeatherTask):
+class FundingProposalsTask(WowletTask):
     """Fetch funding proposals made by the community."""
     def __init__(self, interval: int = 600):
         from wowlet_backend.factory import app

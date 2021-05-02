@@ -6,10 +6,10 @@ from dateutil.parser import parse
 
 import settings
 from wowlet_backend.utils import httpget
-from wowlet_backend.tasks import FeatherTask
+from wowlet_backend.tasks import WowletTask
 
 
-class XmrigTask(FeatherTask):
+class XmrigTask(WowletTask):
     """Fetches the latest XMRig releases using Github's API"""
     def __init__(self, interval: int = 43200):
         super(XmrigTask, self).__init__(interval)
