@@ -41,19 +41,26 @@ class RPCNodeCheckTask(WowletTask):
 
             for network_type, _nodes in _.items():
                 for node in _nodes:
-                    try:
-                        blob = await self.node_check(node, network_type=network_type)
-                        data.append(blob)
-                    except Exception as ex:
-                        app.logger.warning(f"node {node} not reachable; {ex}")
+                    for scheme in ["https", "http"]:
+                        try:
+                            blob = await self.node_check(f"{scheme}://{node}", network_type=network_type)
+                            blob['tls'] = True if scheme == "https" else False
+                            data.append(blob)
+                            break
+                        except Exception as ex:
+                            continue
+
+                    if not data:
+                        app.logger.warning(f"node {node} not reachable")
                         data.append(self._bad_node({
                             "address": node,
                             "nettype": network_type_coin,
                             "type": network_type,
-                            "height": 0
+                            "height": 0,
+                            "tls": False
                         }, reason="unreachable"))
 
-            # not neccesary for stagenet/testnet nodes to be validated
+            # not necessary for stagenet/testnet nodes to be validated
             if network_type_coin != "mainnet":
                 nodes += data
                 continue
@@ -82,14 +89,15 @@ class RPCNodeCheckTask(WowletTask):
         """Call /get_info on the RPC, return JSON"""
         opts = {
             "timeout": self._http_timeout,
-            "json": True
+            "json": True,
+            "verify_tls": False
         }
 
         if network_type == "tor":
             opts["socks5"] = settings.TOR_SOCKS_PROXY
             opts["timeout"] = self._http_timeout_onion
 
-        blob = await httpget(f"http://{node}/get_info", **opts)
+        blob = await httpget(f"{node}/get_info", **opts)
         for expect in ["nettype", "height", "target_height"]:
             if expect not in blob:
                 raise Exception(f"Invalid JSON response from RPC; expected key '{expect}'")

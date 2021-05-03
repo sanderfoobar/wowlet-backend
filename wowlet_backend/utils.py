@@ -54,14 +54,14 @@ def collect_websocket(func):
     return wrapper
 
 
-async def httpget(url: str, json=True, timeout: int = 5, socks5: str = None, raise_for_status=True):
+async def httpget(url: str, json=True, timeout: int = 5, socks5: str = None, raise_for_status=True, verify_tls=True):
     headers = {"User-Agent": random_agent()}
     opts = {"timeout": aiohttp.ClientTimeout(total=timeout)}
     if socks5:
         opts['connector'] = ProxyConnector.from_url(socks5)
 
     async with aiohttp.ClientSession(**opts) as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url, headers=headers, ssl=verify_tls) as response:
             if raise_for_status:
                 response.raise_for_status()
 
