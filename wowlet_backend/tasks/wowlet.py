@@ -48,12 +48,13 @@ class WowletReleasesTask(WowletTask):
         _semver = self.parse_semver(blob)
 
         return {
+            "assets": data,
+            "body": blob['body'],
             "version": {
                 "major": _semver.major,
                 "minor": _semver.minor,
                 "patch": _semver.patch
-            },
-            "assets": data
+            }
         }
 
     def parse_semver(self, blob):
