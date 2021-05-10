@@ -167,3 +167,4 @@ from wowlet_backend.tasks.rpc_nodes import RPCNodeCheckTask
 from wowlet_backend.tasks.xmrig import XmrigTask
 from wowlet_backend.tasks.suchwow import SuchWowTask
 from wowlet_backend.tasks.wowlet import WowletReleasesTask
+from wowlet_backend.tasks.forum import ForumThreadsTask
