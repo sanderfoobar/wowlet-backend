@@ -85,7 +85,7 @@ async def feather_data():
         data = json.loads(data)
         return data
 
-    keys = ["blockheights", "funding_proposals", "crypto_rates", "fiat_rates", "reddit", "rpc_nodes", "xmrig", "xmrto_rates", "suchwow"]
+    keys = ["blockheights", "funding_proposals", "crypto_rates", "fiat_rates", "reddit", "rpc_nodes", "xmrig", "xmrto_rates", "suchwow", "forum"]
     data = {keys[i]: json.loads(val) if val else None for i, val in enumerate(await cache.mget(*keys))}
 
     # @TODO: for backward-compat reasons we're including some legacy keys which can be removed after 1.0 release
