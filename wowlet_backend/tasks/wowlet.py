@@ -2,7 +2,6 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
-import semver
 from dateutil.parser import parse
 
 import settings
@@ -16,7 +15,7 @@ class WowletReleasesTask(WowletTask):
         super(WowletReleasesTask, self).__init__(interval)
 
         self._cache_key = "wowlet_releases"
-        self._cache_expiry = self.interval * 10
+        self._cache_expiry = self.interval
 
         self._websocket_cmd = "wowlet_releases"
 
@@ -45,25 +44,19 @@ class WowletReleasesTask(WowletTask):
                 "size": asset['size']
             }
 
-        _semver = self.parse_semver(blob)
+        tag = blob['tag_name']
+        if tag.startswith("v"):
+            tag = tag[1:]
+
+        try:
+            t = [int(z) for z in tag.split(".")]
+            if len(t) != 3:
+                raise Exception()
+        except:
+            raise Exception(f"invalid tag: {tag}")
 
         return {
             "assets": data,
             "body": blob['body'],
-            "version": {
-                "major": _semver.major,
-                "minor": _semver.minor,
-                "patch": _semver.patch
-            }
+            "version": tag
         }
-
-    def parse_semver(self, blob):
-        tag = blob['tag_name']  # valid tag name example: v0.2.0.0
-        if tag.startswith("v"):
-            tag = tag[1:]
-        tag = tag.split(".")
-        tag = [t for t in tag if t.isdigit()]
-        if tag[0] == '0':
-            tag = tag[1:]
-
-        return semver.VersionInfo.parse(f"{tag[0]}.{tag[1]}.{tag[2]}")
