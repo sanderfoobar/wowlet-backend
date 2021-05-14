@@ -10,4 +10,3 @@ psutil
 psutil
 pillow-simd
 python-magic
-semver

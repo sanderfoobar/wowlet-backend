@@ -2,11 +2,13 @@
 # Copyright (c) 2020, The Monero Project.
 # Copyright (c) 2020, dsc@xmr.pm
 
+import json
 from typing import List, Union
 
 import settings
 from wowlet_backend.utils import httpget
 from wowlet_backend.tasks import WowletTask
+from wowlet_backend.factory import cache
 
 
 class CryptoRatesTask(WowletTask):
@@ -69,6 +71,16 @@ class CryptoRatesTask(WowletTask):
             except Exception as ex:
                 app.logger.error(f"extra coin: {coin}; {ex}")
 
+                # use cache if present
+                data = await cache.get(self._cache_key)
+                if data:
+                    data = json.loads(data)
+                    extra_coin = [e for e in data if e['symbol'] == symbol]
+                    if extra_coin:
+                        app.logger.warning(f"using cache for extra coin: {coin}")
+                        rates.append(extra_coin[0])
+                        continue
+
             try:
                 # additional call to fetch 24h pct change
                 url = f"{self._http_api_gecko}/coins/{coin}?tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false"
@@ -78,5 +90,4 @@ class CryptoRatesTask(WowletTask):
                 pass
 
             rates.append(obj)
-
         return rates
